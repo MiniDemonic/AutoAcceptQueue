@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - main
-    # Only run when commit message starts with "Release v"
-    # GitHub filters on the *entire* commit message
-    # so we use a simple pattern match
-    # (This matches: "Release v1.2.3", "Release v0.9.0", etc.)
-    paths-ignore:
-      - '**.md'
 
 jobs:
   release:
@@ -23,16 +17,22 @@ jobs:
       - name: Extract version from commit message
         id: version
         run: |
-          # Commit message example: "Release v1.2.3"
           MSG="${{ github.event.head_commit.message }}"
           VERSION=$(echo "$MSG" | sed -n 's/Release v\([0-9.]*\).*/\1/p')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Debug directory tree
+        run: |
+          echo "Workspace:"
+          ls -R .
+
       - name: Create ZIP
         run: |
-          ADDON_NAME="AutoAcceptQueue"   # <-- change this to your addon folder name
+          ADDON_NAME="AutoAcceptQueue"
           VERSION="${{ steps.version.outputs.version }}"
-          zip -r "${ADDON_NAME}-v${VERSION}.zip" "$ADDON_NAME"
+          cd ..
+          zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}"
+          mv "${ADDON_NAME}-v${VERSION}.zip" "${GITHUB_WORKSPACE}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
