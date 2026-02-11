@@ -34,7 +34,7 @@ jobs:
           ADDON_NAME="AutoAcceptQueue"
           VERSION="${{ steps.version.outputs.version }}"
           cd ..
-          zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}"
+          zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}" --exclude-from="${ADDON_NAME}/.zipignore"
           mv "${ADDON_NAME}-v${VERSION}.zip" "${GITHUB_WORKSPACE}"
 
       - name: Create GitHub Release
