@@ -28,7 +28,7 @@ jobs:
         run: |
           echo "Workspace:"
           ls -R .
-          
+
       - name: Create ZIP
         run: |
           ADDON_NAME="AutoAcceptQueue"
@@ -41,7 +41,7 @@ jobs:
           rsync -av --exclude-from="${GITHUB_WORKSPACE}/.zipignore" \
             "${GITHUB_WORKSPACE}/" "package/${ADDON_NAME}/"
 
-          # Create ZIP from staging folder
+          # Create ZIP from OUTSIDE the package directory
           cd package
           zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}"
 
