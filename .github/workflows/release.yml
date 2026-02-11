@@ -10,7 +10,7 @@ on:
 
 jobs:
   release:
-    if: startsWith(github.event.head_commit.message, 'Release v')
+    if: startsWith(github.event.head_commit.message, 'Release ')
     runs-on: ubuntu-latest
 
     steps:
@@ -21,9 +21,9 @@ jobs:
         id: version
         run: |
           MSG="${{ github.event.head_commit.message }}"
-          VERSION=$(echo "$MSG" | sed -n 's/Release v\([0-9.]*\).*/\1/p')
+          VERSION=$(echo "$MSG" | sed -n 's/Release \([0-9.]*\).*/\1/p')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          
+
       - name: Debug directory tree
         run: |
           echo "Workspace:"
@@ -43,14 +43,14 @@ jobs:
             --exclude "${ADDON_NAME}/"
 
           # Create ZIP from the workspace root
-          zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}"
+          zip -r "${ADDON_NAME}-${VERSION}.zip" "${ADDON_NAME}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v${{ steps.version.outputs.version }}"
-          name: "v${{ steps.version.outputs.version }}"
+          tag_name: "${{ steps.version.outputs.version }}"
+          name: "${{ steps.version.outputs.version }}"
           files: |
-            AutoAcceptQueue-v${{ steps.version.outputs.version }}.zip
+            AutoAcceptQueue-${{ steps.version.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
