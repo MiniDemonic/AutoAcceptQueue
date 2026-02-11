@@ -34,19 +34,19 @@ jobs:
           ADDON_NAME="AutoAcceptQueue"
           VERSION="${{ steps.version.outputs.version }}"
 
-          # Create staging directory
-          mkdir package
+          # Create staging folder with the SAME NAME as the addon
+          mkdir "${ADDON_NAME}"
 
           # Copy addon files into staging, respecting .zipignore
           rsync -av --exclude-from="${GITHUB_WORKSPACE}/.zipignore" \
-            "${GITHUB_WORKSPACE}/" "package/${ADDON_NAME}/"
+            "${GITHUB_WORKSPACE}/" "${ADDON_NAME}/"
 
-          # Create ZIP from OUTSIDE the package directory
-          cd package
+          # Create ZIP from the parent directory
           zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}"
 
           # Move ZIP back to workspace for release upload
           mv "${ADDON_NAME}-v${VERSION}.zip" "${GITHUB_WORKSPACE}"
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
