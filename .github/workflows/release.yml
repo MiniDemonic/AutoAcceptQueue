@@ -33,9 +33,14 @@ jobs:
         run: |
           ADDON_NAME="AutoAcceptQueue"
           VERSION="${{ steps.version.outputs.version }}"
+
           cd ..
-          zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}" --exclude-from="${ADDON_NAME}/.zipignore"
+          # Convert .zipignore into multiple -x arguments
+          EXCLUDES=$(sed 's/^/-x /' "${ADDON_NAME}/.zipignore" | tr '\n' ' ')
+          eval zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}" $EXCLUDES
+
           mv "${ADDON_NAME}-v${VERSION}.zip" "${GITHUB_WORKSPACE}"
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

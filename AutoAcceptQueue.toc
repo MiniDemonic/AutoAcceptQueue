@@ -3,7 +3,7 @@
 ## Title: AutoAcceptQueue
 ## Author: AkumaMini
 ## Notes: Auto Accepts The Queue
-## Version: 1.0.6
+## Version: 1.0.7
 ## SavedVariables: AutoAcceptQueueDB
 
 ## Category: Fixes
