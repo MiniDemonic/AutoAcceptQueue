@@ -1,0 +1,45 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - main
+    # Only run when commit message starts with "Release v"
+    # GitHub filters on the *entire* commit message
+    # so we use a simple pattern match
+    # (This matches: "Release v1.2.3", "Release v0.9.0", etc.)
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  release:
+    if: startsWith(github.event.head_commit.message, 'Release v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from commit message
+        id: version
+        run: |
+          # Commit message example: "Release v1.2.3"
+          MSG="${{ github.event.head_commit.message }}"
+          VERSION=$(echo "$MSG" | sed -n 's/Release v\([0-9.]*\).*/\1/p')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create ZIP
+        run: |
+          ADDON_NAME="AutoAcceptQueue"   # <-- change this to your addon folder name
+          VERSION="${{ steps.version.outputs.version }}"
+          zip -r "${ADDON_NAME}-v${VERSION}.zip" "$ADDON_NAME"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.version.outputs.version }}"
+          name: "v${{ steps.version.outputs.version }}"
+          files: |
+            AutoAcceptQueue-v${{ steps.version.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
