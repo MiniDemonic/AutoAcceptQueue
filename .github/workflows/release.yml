@@ -28,19 +28,25 @@ jobs:
         run: |
           echo "Workspace:"
           ls -R .
-
+          
       - name: Create ZIP
         run: |
           ADDON_NAME="AutoAcceptQueue"
           VERSION="${{ steps.version.outputs.version }}"
 
-          cd ..
-          # Convert .zipignore into multiple -x arguments
-          EXCLUDES=$(sed 's/^/-x /' "${ADDON_NAME}/.zipignore" | tr '\n' ' ')
-          eval zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}" $EXCLUDES
+          # Create staging directory
+          mkdir package
 
+          # Copy addon files into staging, respecting .zipignore
+          rsync -av --exclude-from="${GITHUB_WORKSPACE}/.zipignore" \
+            "${GITHUB_WORKSPACE}/" "package/${ADDON_NAME}/"
+
+          # Create ZIP from staging folder
+          cd package
+          zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}"
+
+          # Move ZIP back to workspace for release upload
           mv "${ADDON_NAME}-v${VERSION}.zip" "${GITHUB_WORKSPACE}"
-
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
