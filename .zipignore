@@ -1,0 +1,8 @@
+.git/
+.github/
+.vscode/
+*.md
+*.txt
+*.psd
+*.xcf
+.DS_Store
