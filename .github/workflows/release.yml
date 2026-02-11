@@ -42,27 +42,6 @@ jobs:
 
           zip -r "${ADDON_NAME}-${VERSION}.zip" "${ADDON_NAME}"
 
-      # ⭐ NEW STEP — correctly formatted release.json
-      - name: Create release.json
-        run: |
-          ADDON_NAME="AutoAcceptQueue"
-          VERSION="${{ steps.version.outputs.version }}"
-          cat <<EOF > release.json
-          {
-            "releases": [
-              {
-                "name": "${ADDON_NAME}",
-                "version": "${VERSION}",
-                "filename": "${ADDON_NAME}-${VERSION}.zip",
-                "nolib": false,
-                "metadata": [
-                  { "flavor": "mainline", "interface": 120000 }
-                ]
-              }
-            ]
-          }
-          EOF
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -70,6 +49,5 @@ jobs:
           name: "${{ steps.version.outputs.version }}"
           files: |
             AutoAcceptQueue-${{ steps.version.outputs.version }}.zip
-            release.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
