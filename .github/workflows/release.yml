@@ -23,7 +23,7 @@ jobs:
           MSG="${{ github.event.head_commit.message }}"
           VERSION=$(echo "$MSG" | sed -n 's/Release v\([0-9.]*\).*/\1/p')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
+          
       - name: Debug directory tree
         run: |
           echo "Workspace:"
@@ -42,13 +42,8 @@ jobs:
             "${GITHUB_WORKSPACE}/" "${ADDON_NAME}/" \
             --exclude "${ADDON_NAME}/"
 
-          # Create ZIP from the parent directory
+          # Create ZIP from the workspace root
           zip -r "${ADDON_NAME}-v${VERSION}.zip" "${ADDON_NAME}"
-
-          # Move ZIP back to workspace for release upload
-          mv "${ADDON_NAME}-v${VERSION}.zip" "${GITHUB_WORKSPACE}"
-
-
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
